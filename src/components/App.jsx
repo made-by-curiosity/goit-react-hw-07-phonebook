@@ -1,8 +1,8 @@
-import { ContactList } from 'components/ContactList/ContactList';
-import { Form } from 'components/Form/Form';
 import { Container } from './Container/Container';
 import { Section } from './Section/Section';
+import { Form } from 'components/Form/Form';
 import { Filter } from './Filter/Filter';
+import { ContactList } from 'components/ContactList/ContactList';
 
 export const App = () => {
   return (

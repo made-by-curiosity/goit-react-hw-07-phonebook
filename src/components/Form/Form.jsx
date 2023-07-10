@@ -1,14 +1,12 @@
-import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { AddButton, PhonebookForm, ErrorText } from './Form.styled';
-import { useDispatch, useSelector } from 'react-redux';
-import { nanoid } from 'nanoid';
-import { addContact, getContacts } from 'redux/contacts/slice';
+import { selectContacts } from 'redux/contacts/selectors';
+import { addContact } from 'redux/contacts/operations';
 
 export const Form = () => {
   const dispatch = useDispatch();
-  const contacts = useSelector(getContacts);
-
+  const contacts = useSelector(selectContacts);
   const {
     register,
     handleSubmit,
@@ -17,26 +15,23 @@ export const Form = () => {
   } = useForm({
     defaultValues: {
       name: '',
-      number: '',
+      phone: '',
     },
     mode: 'onChange',
   });
 
-  const onSubmit = values => {
-    const hasContact = contacts.find(contact => values.name === contact.name);
+  const onSubmit = newContactValues => {
+    const hasContact = contacts.find(
+      contact => newContactValues.name === contact.name
+    );
 
     if (hasContact) {
-      alert(`${values.name} is already in contacts`);
+      alert(`${newContactValues.name} is already in contacts`);
 
       return;
     }
 
-    const newContact = {
-      id: nanoid(),
-      ...values,
-    };
-
-    dispatch(addContact(newContact));
+    dispatch(addContact(newContactValues));
   };
 
   return (
@@ -63,10 +58,10 @@ export const Form = () => {
       </label>
       <ErrorText>{errors?.name?.message}</ErrorText>
 
-      <label htmlFor="number">
+      <label htmlFor="phone">
         <p>Number</p>
         <input
-          {...register('number', {
+          {...register('phone', {
             required: 'Number is required',
             pattern: {
               value:
@@ -78,7 +73,7 @@ export const Form = () => {
           title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
         />
       </label>
-      <ErrorText>{errors?.number?.message}</ErrorText>
+      <ErrorText>{errors?.phone?.message}</ErrorText>
       <AddButton type="submit" disabled={!isValid}>
         Add Contact
       </AddButton>

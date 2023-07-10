@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ContactsFilter, FilterInput } from './Filter.styled';
 import { useDispatch, useSelector } from 'react-redux';
-import { getFilter, updateFilter } from 'redux/filter/slice';
+import { ContactsFilter, FilterInput } from './Filter.styled';
+import { updateFilter } from 'redux/filter/slice';
+import { selectFilter } from 'redux/filter/selectors';
 
 export const Filter = ({ filterTitle }) => {
   const dispatch = useDispatch();
-  const filter = useSelector(getFilter);
+  const filter = useSelector(selectFilter);
 
   const handleFilter = e => {
     dispatch(updateFilter(e.target.value));

@@ -1,13 +1,24 @@
-import React from 'react';
-import { ContactItem, DeleteBtn } from './ContactList.styled';
-import { deleteContact, getContacts } from 'redux/contacts/slice';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getFilter } from 'redux/filter/slice';
+import { ContactItem, DeleteBtn } from './ContactList.styled';
+import { fetchContacts, deleteContact } from 'redux/contacts/operations';
+import {
+  selectContacts,
+  selectError,
+  selectIsLoading,
+} from 'redux/contacts/selectors';
+import { selectFilter } from 'redux/filter/selectors';
 
 export const ContactList = () => {
   const dispatch = useDispatch();
-  const contacts = useSelector(getContacts);
-  const filter = useSelector(getFilter);
+  const contacts = useSelector(selectContacts);
+  const isLoading = useSelector(selectIsLoading);
+  const error = useSelector(selectError);
+  const filter = useSelector(selectFilter);
+
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
 
   const handleDelete = contactId => {
     dispatch(deleteContact(contactId));
@@ -15,30 +26,36 @@ export const ContactList = () => {
 
   const filterContacts = () => {
     const normalizedFilter = filter.toLowerCase();
-
     return contacts.filter(contact =>
       contact.name.toLowerCase().includes(normalizedFilter)
     );
   };
 
-  const filteredContacts = filterContacts();
+  // чтобы контакты вверху добавлялись
+  const filteredContacts = filterContacts().reverse();
 
   return (
-    <ul>
-      {filteredContacts.map(({ id, name, number }) => {
-        return (
-          <ContactItem key={id}>
-            <span>{name}: </span> <span>{number}</span>{' '}
-            <DeleteBtn
-              onClick={() => {
-                handleDelete(id);
-              }}
-            >
-              Delete
-            </DeleteBtn>
-          </ContactItem>
-        );
-      })}
-    </ul>
+    <>
+      {isLoading && !error && <div>Loading...</div>}
+      {error && !isLoading && (
+        <div>Sorry, something went wrong. Try again later</div>
+      )}
+      <ul>
+        {filteredContacts.map(({ id, name, phone }) => {
+          return (
+            <ContactItem key={id}>
+              <span>{name}: </span> <span>{phone}</span>{' '}
+              <DeleteBtn
+                onClick={() => {
+                  handleDelete(id);
+                }}
+              >
+                Delete
+              </DeleteBtn>
+            </ContactItem>
+          );
+        })}
+      </ul>
+    </>
   );
 };
